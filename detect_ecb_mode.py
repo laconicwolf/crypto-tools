@@ -2,7 +2,7 @@
 
 
 __author__ = 'Jake Miller (@LaconicWolf)'
-__date__ = '20180523'
+__date__ = '20180524'
 __version__ = '0.01'
 __description__ = """Attempts to detect ECB mode in ciphertext"""
 
