@@ -185,6 +185,9 @@ def main():
         ciphertext = hex_decode(ciphertext)
     result, key = break_repeating_key_xor(ciphertext)
     print("Key: {}\nMessage: {}".format(key, result))
+    if args.outfile:
+        with open(args.outfile, 'wb') as fh:
+            fh.write(result)
 
 
 if __name__ == '__main__':
