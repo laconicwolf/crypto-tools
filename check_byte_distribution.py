@@ -89,6 +89,8 @@ def main():
         if args.b64_decode:
             item = base64.b64decode(item)
         if args.hex_decode:
+            if b'\n' in item:
+                item = item.replace(b'\n', b'')
             item = bytes.fromhex(item.decode())
         item_list = get_integer_list(item)
         integer_list = [i for i in range(256)]
