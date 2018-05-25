@@ -69,6 +69,8 @@ def base64_decode(input_bytes):
 def encrypt_aes_ecb(data, key):
     """Returns data encrypted with AES in ECB mode."""
     cipher = AES.new(key, AES.MODE_ECB)
+
+    # Only pad the data if it isn't the size of the block
     if not len(data) % block_size == 0:
         ciphertext = cipher.encrypt(pad(data, AES.block_size))
     else:
@@ -82,17 +84,29 @@ def decrypt_aes_ecb(data, key):
     plaintext = cipher.decrypt(data)
     try:
         return unpad(plaintext, AES.block_size)
-    except Exception as e:
+    except ValueError:
         return plaintext
 
 
 def encrypt_aes_cbc(data, key, iv):
     """Returns AES encrypted ciphertext in CBC mode."""
+    # Sets the initial IV. During the encryption (in the for
+    # loop), prev will be reset to previous ciphertext block.
     prev = iv
     ciphertext = b''
+
+    # Divides the plaintext into block size-sized chunks
     plaintext_blocks = [data[i:i+block_size] for i in range(0, len(data), block_size)]
+
+    # Iterate over each block
     for plaintext_block in plaintext_blocks:
+
+        # XORs block with the previous ciphertext block, or
+        # with the IV if first block. 
         xor_data = strxor(plaintext_block, prev)
+
+        # Encrypts the block and adds it to the ciphertext 
+        # byte string
         ciphertext_block = encrypt_aes_ecb(xor_data, key)
         ciphertext += ciphertext_block
         prev = ciphertext_block 
@@ -103,13 +117,25 @@ def decrypt_aes_cbc(data, key, iv):
     """Returns plaintext from an AES encrypted ciphertext
     in CBC mode.
     """
+    # Sets the initial IV. During the decryption (in the for
+    # loop), prev will be reset to previous ciphertext block.
     prev = iv
     plaintext = b''
+
+    # Divides the ciphertext into block size-sized chunks
     ciphertext_blocks = [data[i:i+block_size] for i in range(0, len(data), block_size)]
+
+    # Iterate over each block
     for ciphertext_block in ciphertext_blocks:
-        plaintext_block = decrypt_aes_ecb(ciphertext_block, key)
-        xor_data = strxor(plaintext_block, prev)
-        plaintext += xor_data
+
+        # Decrypts the block. This block still needs to be XOR'd
+        # against the previous block (or IV if first block) to 
+        # recover the plaintext.
+        decrypted_block = decrypt_aes_ecb(ciphertext_block, key)
+        
+        # XOR's the decrypted block with the previous block, or 
+        # IV if the first block. This produces the plaintext
+        plaintext += strxor(decrypted_block, prev)
         prev = ciphertext_block 
     return plaintext
 
