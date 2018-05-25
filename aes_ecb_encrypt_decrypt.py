@@ -76,10 +76,10 @@ def decrypt_aes_ecb(data, key):
     """Returns data decrypted with AES in ECB mode"""
     cipher = AES.new(key, AES.MODE_ECB)
     plaintext = cipher.decrypt(data)
-    if len(plaintext) % AES.block_size == 0:
-        return plaintext
-    else:
+    try:
         return unpad(plaintext, AES.block_size)
+    except Exception as e:
+        return plaintext
 
 
 def main():
