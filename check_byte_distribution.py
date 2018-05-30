@@ -66,7 +66,7 @@ def plot_scatter(data):
     """Plots a scatter chart from the given data.
     """
     positions = [i for i in range(len(data))]
-    plt.scatter(data_list, positions, edgecolors='r')
+    plt.scatter(data, positions, edgecolors='r')
     plt.title('Byte Scatter Plot')
     plt.ylabel('Occurence')
     plt.xlabel('Byte Values')
